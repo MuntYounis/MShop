@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MShop.API.data;
 using MShop.API.Services;
-
 using Scalar.AspNetCore;
 
 namespace MShop.API
@@ -18,10 +17,14 @@ namespace MShop.API
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-            builder.Services.AddScoped<IOS,MacServices>();
+            //builder.Services.AddScoped<IOS,MacServices>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection")));
+
+            builder.Services.AddScoped<ICategoryService,CategoryService>();
+
+            builder.Services.AddScoped<IProductService,ProductService>();
 
             var app = builder.Build();
 
