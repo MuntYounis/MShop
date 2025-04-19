@@ -1,13 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MShop.API.Models;
 
 namespace MShop.API.data
 
 {
 
-        public class ApplicationDbContext : DbContext
+        public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         {
-            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        internal object brands;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
                 : base(options)
             {
             }
@@ -17,5 +20,8 @@ namespace MShop.API.data
         public DbSet<Product> Products { get; set; }
 
         public DbSet<Brand> Brands { get; set; }
+
+
+
     }
 }

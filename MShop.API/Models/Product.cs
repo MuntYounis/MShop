@@ -12,7 +12,7 @@ namespace MShop.API.Models
         [Column(TypeName = "decimal(5,2)")]
         public decimal Discount { get; set; }
 
-        public string mainImg { get; set; }
+        public string? mainImg { get; set; }
 
         public int Quantity {  get; set; }
 

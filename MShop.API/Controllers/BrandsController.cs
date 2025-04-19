@@ -7,47 +7,51 @@ using Mapster;
 using MShop.API.DTOs.Requests;
 using MShop.API.DTOs.Resposnses;
 using Azure.Core;
+using MShop.API.Services;
+using Microsoft.OpenApi.Models;
 namespace MShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BrandsController : ControllerBase
+    public class BrandsController(IBrandService brandService): ControllerBase
     {
-        ApplicationDbContext _context;
-        public BrandsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IBrandService brandService = brandService;
+
+
         [HttpGet("")]
         public IActionResult getAll()
         {
-            var brands = _context.Brands.ToList();
-            if (brands is null) {
-                return NotFound();
-            }
-            return Ok(brands);
+            var brands = brandService.GetAll();
+            return Ok(brands.Adapt<IEnumerable<BrandResponse>>());
         }
 
         [HttpGet("{id}")]
         public IActionResult getById([FromRoute] int id)
         { 
-            var brand = _context.Brands.Find(id);
-            if (brand is null)
-            {
-                return NotFound();
-            }
-            return Ok(brand);
-        
+            var brand = brandService.Get(b=>b.Id == id);
+            return brand ==null? NotFound() : Ok(brand.Adapt<BrandResponse>());
+  
         }
         [HttpPost("")]
         public IActionResult Create([FromBody] BrandRequest brandRequest)
         {
-            var brand = brandRequest.Adapt<Brand>();
-            _context.Brands.Add(brand);
-            _context.SaveChanges();
-            var response = brand.Adapt<BrandResponse>();
-            return Created($"https://localhost:7245/api/Brands/{brand.Id}", response);
+            var brandInDb = brandService.Add(brandRequest.Adapt<Brand>());
+            return CreatedAtAction(nameof(getById),new { brandInDb.Id },brandInDb); 
 
+        }
+        [HttpPut("{id}")]
+        public IActionResult Update([FromRoute]int id,[FromBody] Brand brandRequest)
+        {
+            var brandInDb = brandService.Edit(id, brandRequest.Adapt<Brand>());
+            if(!brandInDb) return NotFound();
+            return NoContent(); 
+        }
+        [HttpDelete]
+        public IActionResult Delete([FromRoute]int id)
+        {
+            var brandInDb= brandService.Remove(id);
+            if(!brandInDb) return NotFound();
+            return NoContent();
         }
     }
 }

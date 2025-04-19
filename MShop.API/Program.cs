@@ -1,6 +1,8 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MShop.API.data;
+using MShop.API.Models;
 using MShop.API.Services;
 using Scalar.AspNetCore;
 
@@ -25,6 +27,12 @@ namespace MShop.API
             builder.Services.AddScoped<ICategoryService,CategoryService>();
 
             builder.Services.AddScoped<IProductService,ProductService>();
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = false;
+            }
+                ).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
             var app = builder.Build();
 

@@ -7,39 +7,42 @@ using MShop.API.Services;
 using Mapster;
 using MShop.API.DTOs.Resposnses;
 using MShop.API.DTOs.Requests;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 
 namespace MShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] //for anyone to use this controller they should have cookies
     public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
         private readonly ICategoryService categoryService = categoryService;
 
 
         [HttpGet("")]
-        public IActionResult getAll()
+        public async Task<IActionResult> getAll()
         {
-            var categories = categoryService.GetAll();
+            var categories =await categoryService.GetAsync();
             return Ok(categories.Adapt<IEnumerable<CategoryResponse>>());
         }
 
         [HttpGet("{id}")]
-        public IActionResult getById([FromRoute]int id) { 
+        public async Task<IActionResult> getById([FromRoute]int id) { 
 
-            var category = categoryService.Get(e=>e.Id==id);
+            var category =await categoryService.GetOneAsync(e=>e.Id==id);
 
             return category == null ? NotFound() : Ok(category.Adapt<CategoryResponse>());
 
         }
 
         [HttpPost("")]
-        public IActionResult Create([FromBody]CategoryRequest categoryRequest) {
+        public async Task<IActionResult> CreateAsync([FromBody]CategoryRequest categoryRequest, CancellationToken cancellationToken) {
 
      
 
-            var categoryInDb = categoryService.Add(categoryRequest.Adapt<Category>());
+            var categoryInDb =await categoryService.AddAsync(categoryRequest.Adapt<Category>(),cancellationToken);
             
             //return Created($"{Request.Scheme}://{Request.Host}/api/Categories/{category.Id}",category);
 
@@ -49,8 +52,8 @@ namespace MShop.API.Controllers
 
         [HttpPut("{id}")]
 
-        public IActionResult Update([FromRoute]int id,[FromBody] Category categoryRequest) {
-            var categoryInDb = categoryService.Edit(id, categoryRequest.Adapt<Category>());
+        public async Task<IActionResult> UpdateAsync([FromRoute]int id,[FromBody] Category categoryRequest) {
+            var categoryInDb =await categoryService.EditAsync(id, categoryRequest.Adapt<Category>());
             if(!categoryInDb) return NotFound();
 
             return NoContent();
@@ -59,8 +62,8 @@ namespace MShop.API.Controllers
 
         [HttpDelete("{id}")]
 
-        public IActionResult Delete([FromRoute]int id) {
-            var categoryInDb = categoryService.Remove(id);
+        public async Task<IActionResult> Delete([FromRoute]int id) {
+            var categoryInDb =await categoryService.RemoveAsync(id);
             if (!categoryInDb) return NotFound();
 
             return NoContent();

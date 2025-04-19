@@ -7,11 +7,11 @@ namespace MShop.API.Services
 {
     public interface IProductService
     {
-        IEnumerable<Product>GetAll();
+        IQueryable<Product>GetAll();
         Product ? Get(Expression<Func<Product, bool>> expression);
         Product Add(Product product);
 
-        bool Edit(int id, Product product);
+        bool Edit(int id, Product product, IFormFile mainImg);
 
         bool Remove(int id);
     }
