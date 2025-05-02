@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using MShop.API.DTOs.Requests;
 using MShop.API.DTOs.Resposnses;
 using MShop.API.Models;
 using MShop.API.Services;
+using MShop.API.Utility;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -15,12 +17,14 @@ namespace MShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = $"{StaticData.SuperAdmin},{StaticData.Admin},{StaticData.Company}")]
     public class ProductsController(IProductService productService) : ControllerBase
     {
         private readonly IProductService productService = productService;
 
 
         [HttpGet("")]
+        [AllowAnonymous]
         public IActionResult GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int limit = 10)
         {
             if (page <= 0 || limit <= 0) { 

@@ -9,13 +9,15 @@ using MShop.API.DTOs.Resposnses;
 using MShop.API.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using MShop.API.Utility;
 
 
 namespace MShop.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] //for anyone to use this controller they should have cookies
+    [Authorize]
+     //for anyone to use this controller they should have cookies
     public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
         private readonly ICategoryService categoryService = categoryService;
@@ -38,6 +40,7 @@ namespace MShop.API.Controllers
         }
 
         [HttpPost("")]
+        [Authorize(Roles = $"{StaticData.SuperAdmin},{StaticData.Admin},{StaticData.Company}")]
         public async Task<IActionResult> CreateAsync([FromBody]CategoryRequest categoryRequest, CancellationToken cancellationToken) {
 
      
@@ -51,7 +54,7 @@ namespace MShop.API.Controllers
         }
 
         [HttpPut("{id}")]
-
+        [Authorize(Roles = $"{StaticData.SuperAdmin},{StaticData.Admin},{StaticData.Company}")]
         public async Task<IActionResult> UpdateAsync([FromRoute]int id,[FromBody] Category categoryRequest) {
             var categoryInDb =await categoryService.EditAsync(id, categoryRequest.Adapt<Category>());
             if(!categoryInDb) return NotFound();
@@ -61,7 +64,7 @@ namespace MShop.API.Controllers
         }
 
         [HttpDelete("{id}")]
-
+        [Authorize(Roles = $"{StaticData.SuperAdmin},{StaticData.Admin},{StaticData.Company}")]
         public async Task<IActionResult> Delete([FromRoute]int id) {
             var categoryInDb =await categoryService.RemoveAsync(id);
             if (!categoryInDb) return NotFound();
